@@ -16,20 +16,16 @@ ARG BIRD_IMAGE=calico/bird:latest
 FROM calico/bpftool:v5.0-amd64 as bpftool
 FROM ${BIRD_IMAGE} as bird
 
-FROM debian:9.8-slim
+FROM debian:buster-slim
 LABEL maintainer "Casey Davenport <casey@tigera.io>"
 
 ARG ARCH=amd64
 
-# Install a backported version of iptables to ensure we have version 1.6.2
-# Similarly for iproute2, we want a more recent version for BPF support.
-RUN printf "deb http://deb.debian.org/debian stretch-backports main\n" > /etc/apt/sources.list.d/backports.list \ 
-    && apt-get update \
-    && apt-get -t stretch-backports install -y iptables iproute2
-
 # Install remaining runtime deps required for felix from the global repository
 RUN apt-get update && apt-get install -y \
     ipset \
+    iptables \
+    iproute2 \
     iputils-arping \
     iputils-ping \
     iputils-tracepath \
